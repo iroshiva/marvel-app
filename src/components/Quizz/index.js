@@ -38,9 +38,13 @@ class Quizz extends Component {
   // va servir à chercher les questions du niveau dans l'objet QuizMarvel
   loadQuestions = (levelName) => {
     // on cherche les questions en rapport au levelName
+    console.log(levelName, QuizMarvel[0].quizz);
     const fetchedArrayQuiz = QuizMarvel[0].quizz[levelName];
 
-    if (fetchedArrayQuiz.length >= this.state.maxQuestions) {
+    if (
+      fetchedArrayQuiz &&
+      fetchedArrayQuiz.length >= this.state.maxQuestions
+    ) {
       // on stocke les questions du levelName dans une ref
       // va servir pour comparer la reponse de l'uti à la réponse souhaitée
       // ET afficher le résumé à la fin d'un niveau
@@ -48,6 +52,7 @@ class Quizz extends Component {
 
       // permet de récupérer toutes les questions du niveau sans leur réponse !!!!
       const newArray = fetchedArrayQuiz.map(({ answer, ...keepRest }) => {
+        // console.log(keepRest);
         return keepRest;
       });
 
@@ -81,12 +86,7 @@ class Quizz extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     // destructuring du state
-    const {
-      storedQuestions,
-      idQuestion,
-      score,
-      isLevelEnd,
-    } = this.state;
+    const { storedQuestions, idQuestion, score, isLevelEnd } = this.state;
     // une fois les questions d'un niveau chargé
     // pour toutes les questions du niveau
     if (
@@ -102,10 +102,7 @@ class Quizz extends Component {
 
     // suite au click sur next question
     // l'idQuestion a été incrementée
-    if (
-      idQuestion !== prevState.idQuestion &&
-      storedQuestions.length - 1
-    ) {
+    if (idQuestion !== prevState.idQuestion && storedQuestions.length - 1) {
       // au passe à la question et propositions suivantes
       // on réinitialise les autres states
       this.setState({
@@ -116,19 +113,17 @@ class Quizz extends Component {
       });
     }
 
-    // affichage notification du pseudo de l'utilisateur
+    // affichage notification d'accueil de l'utilisateur
     if (this.props.data.pseudo !== prevProps.data.pseudo) {
       this.showToastMsg(this.props.data.pseudo);
     }
 
     // suite au nextLevel
+    // console.log(prevState.isLevelEnd);
     if (isLevelEnd !== prevState.isLevelEnd) {
       // lors de la fin du questionnaire d'un niveau
       // on récup le score en pourcentage
-      const gradePercent = this.getPercent(
-        storedQuestions.length,
-        score
-      );
+      const gradePercent = this.getPercent(storedQuestions.length, score);
 
       this.levelOver(gradePercent);
     }
@@ -198,7 +193,7 @@ class Quizz extends Component {
 
   // method qui permet de passer au prochain niveau dans le component LevelOver
   nextLevel = (quizLevel) => {
-    console.log(quizLevel);
+    // console.log(quizLevel);
     this.setState({
       ...initialState,
       quizLevel: quizLevel,
@@ -238,7 +233,7 @@ class Quizz extends Component {
       btnDisabled,
       score,
       isLevelEnd,
-      percent
+      percent,
     } = this.state;
 
     const displayOptions = options.map((option, index) => {
@@ -279,9 +274,7 @@ class Quizz extends Component {
           disabled={btnDisabled}
           onClick={this.nextQuestion}
         >
-          {this.state.idQuestion < maxQuestions - 1
-            ? "Suivant"
-            : "Terminer"}
+          {this.state.idQuestion < maxQuestions - 1 ? "Suivant" : "Terminer"}
         </button>
         <ToastContainer />
       </>
